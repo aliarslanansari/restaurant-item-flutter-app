@@ -29,7 +29,7 @@ class Order {
   Map<String, dynamic> toJson() => {
         "orderedProduct":
             List<dynamic>.from(orderedProduct.map((x) => x.toJson())),
-        "orderDate": orderDate,
+        "orderDate": orderDate.toUtc().toString(),
         "orderId": orderId,
       };
 }
