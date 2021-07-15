@@ -1,5 +1,3 @@
-import 'package:cartapp/models/orders.dart';
-
 class ProductCategory {
   List<Product> products;
 
