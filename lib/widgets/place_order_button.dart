@@ -1,4 +1,3 @@
-import 'package:cartapp/models/products.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,9 +6,10 @@ class PlaceOrderButton extends StatefulWidget {
   int itemCount;
   bool isDisabled = false;
   Function(int quantity) onItemSelect;
+  bool isManageOrder;
 
-  PlaceOrderButton(
-      this.onCountChange, this.itemCount, this.isDisabled, this.onItemSelect);
+  PlaceOrderButton(this.onCountChange, this.itemCount, this.isDisabled,
+      this.onItemSelect, this.isManageOrder);
 
   @override
   _PlaceOrderButtonState createState() => _PlaceOrderButtonState();
@@ -19,7 +19,7 @@ class _PlaceOrderButtonState extends State<PlaceOrderButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: widget.itemCount != 0
+      child: (widget.isManageOrder) || widget.itemCount != 0
           ? ButtonTheme(
               disabledColor: Colors.orange[100],
               child: Container(
@@ -42,9 +42,11 @@ class _PlaceOrderButtonState extends State<PlaceOrderButton> {
                         padding:
                             EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                         iconSize: 15,
-                        onPressed: () {
-                          widget.onItemSelect(-1);
-                        }),
+                        onPressed: widget.isManageOrder
+                            ? null
+                            : () {
+                                widget.onItemSelect(-1);
+                              }),
                     Padding(
                       padding: const EdgeInsets.all(0),
                       child: CircleAvatar(

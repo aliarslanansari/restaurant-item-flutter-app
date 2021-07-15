@@ -9,8 +9,11 @@ class ItemRow extends StatefulWidget {
   Order currentOrder;
   Function(Product prod, int quantity) onProductAdd;
   int quantity;
-
-  ItemRow(this.product, this.currentOrder, this.onProductAdd, this.quantity);
+  bool isManageOrder = false;
+  int index;
+  Function(OrderedProduct prod, int quantity) onProductUpdate;
+  ItemRow(this.product, this.currentOrder, this.onProductAdd, this.quantity,
+      [this.isManageOrder, this.index, this.onProductUpdate]);
 
   @override
   _ItemRowState createState() => _ItemRowState();
@@ -21,7 +24,12 @@ class _ItemRowState extends State<ItemRow> {
   OrderedProduct currentOrderProduct;
 
   onItemSelect(int add) {
-    widget.onProductAdd(widget.product, add);
+    if (!widget.isManageOrder) {
+      widget.onProductAdd(widget.product, add);
+    } else {
+      widget.onProductUpdate(
+          widget.currentOrder.orderedProduct[widget.index], 1);
+    }
   }
 
   @override
@@ -36,27 +44,45 @@ class _ItemRowState extends State<ItemRow> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.product.name,
+                  widget.isManageOrder
+                      ? widget.currentOrder.orderedProduct[widget.index].name
+                      : widget.product.name,
                   style: TextStyle(
                       fontSize: 16,
-                      color:
-                          !widget.product.inStock ? Colors.grey : Colors.black),
+                      color: !widget.isManageOrder && !widget.product.inStock
+                          ? Colors.grey
+                          : Colors.black),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
                   child: Text(
-                    '\$' +
-                        widget.product.price.toString() +
-                        " | Quantity Available: " +
-                        widget.product.quantity.toString(),
+                    widget.isManageOrder
+                        ? "\$" +
+                            widget
+                                .currentOrder.orderedProduct[widget.index].price
+                                .toString() +
+                            " | Quantity Ordered: " +
+                            widget.currentOrder.orderedProduct[widget.index]
+                                .quantity
+                                .toString()
+                        : '\$' +
+                            widget.product.price.toString() +
+                            " | Quantity Available: " +
+                            widget.product.quantity.toString(),
                     style: TextStyle(color: Colors.grey),
                   ),
                 )
               ],
             ),
             Expanded(child: Text('')),
-            PlaceOrderButton((String i, String l) => {}, widget.quantity,
-                !widget.product.inStock, onItemSelect),
+            PlaceOrderButton(
+                (String i, String l) => {},
+                !widget.isManageOrder
+                    ? widget.quantity
+                    : widget.currentOrder.orderedProduct[widget.index].quantity,
+                !widget.isManageOrder && !widget.product.inStock,
+                onItemSelect,
+                widget.isManageOrder),
           ],
         ),
       ),

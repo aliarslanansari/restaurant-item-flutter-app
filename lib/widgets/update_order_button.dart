@@ -2,27 +2,24 @@ import 'package:cartapp/models/orders.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class PlaceOrderButtonMain extends StatefulWidget {
+class UpdateOrderButton extends StatefulWidget {
   Order currentOrder;
-  Function onPlaceOrderClick;
-  bool orderPlaced = false;
-  bool orderSaved = false;
-  PlaceOrderButtonMain(this.currentOrder, this.onPlaceOrderClick,
-      this.orderPlaced, this.orderSaved,
+  bool orderSaved;
+  Function onOrderSave;
+  UpdateOrderButton(this.currentOrder, this.orderSaved, this.onOrderSave,
       {Key key})
       : super(key: Key(DateTime.now().toString()));
 
   @override
-  _PlaceOrderButtonMainState createState() => _PlaceOrderButtonMainState();
+  _UpdateOrderButtonState createState() => _UpdateOrderButtonState();
 }
 
-class _PlaceOrderButtonMainState extends State<PlaceOrderButtonMain> {
+class _UpdateOrderButtonState extends State<UpdateOrderButton> {
   int totalPrice = 0;
   OrderedProduct orderedProduct;
 
   @override
   void initState() {
-    print('CALLED');
     super.initState();
     orderedProduct = null;
     totalPrice = 0;
@@ -43,22 +40,16 @@ class _PlaceOrderButtonMainState extends State<PlaceOrderButtonMain> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
         child: FlatButton(
-          disabledColor: Colors.green,
           height: 50,
-          onPressed: !widget.orderSaved
-              ? () {
-                  widget.onPlaceOrderClick(1);
-                }
-              : null,
+          onPressed: () {
+            widget.onOrderSave(true);
+          },
           child: Row(
             children: [
               Expanded(child: Text('')),
               Expanded(
-                  child: Text(widget.orderSaved
-                      ? "Order Saved"
-                      : widget.orderPlaced
-                          ? 'Update Order'
-                          : 'Place Order')),
+                  child:
+                      Text(widget.orderSaved ? "Order Saved" : 'Update Order')),
               Text("\$" + totalPrice.toString())
             ],
           ),

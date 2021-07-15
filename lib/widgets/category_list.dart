@@ -7,17 +7,16 @@ import 'package:flutter/material.dart';
 class CategoryList extends StatefulWidget {
   List<ProductCategory> categories;
   Order currentOrder;
+  Function(OrderedProduct prod, int quantity) onProductUpdate;
 
   Function(bool isExpanded, int indexE) onExpansionChange;
+  bool isManageOrder = false;
 
   Function(Product prod, int quantity) onProductAdd;
 
-  CategoryList(
-    this.categories,
-    this.currentOrder,
-    this.onProductAdd,
-    this.onExpansionChange,
-  );
+  CategoryList(this.categories, this.currentOrder, this.onProductAdd,
+      this.onExpansionChange,
+      {this.isManageOrder, this.onProductUpdate});
 
   @override
   _CategoryListState createState() => _CategoryListState();
@@ -41,32 +40,48 @@ class _CategoryListState extends State<CategoryList> {
             widget.categories[catIndex].products[i],
             widget.currentOrder,
             widget.onProductAdd,
-            currentOrderProduct != null ? currentOrderProduct.quantity : 0);
+            currentOrderProduct != null ? currentOrderProduct.quantity : 0,
+            false,
+            0,
+            widget.onProductUpdate);
+      });
+
+  List<Widget> _getOrderedChildren(int count) =>
+      List<Widget>.generate(count, (i) {
+        return ItemRow(new Product(), widget.currentOrder, widget.onProductAdd,
+            0, true, i, widget.onProductUpdate);
       });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        itemCount: widget.categories.length,
+        itemCount: widget.isManageOrder ? 1 : widget.categories.length,
         itemBuilder: (BuildContext context, int index) {
           return ExpansionTile(
+            initiallyExpanded: index == 0,
             title: Row(
               children: [
                 Text(
-                  widget.categories[index].name,
+                  widget.isManageOrder
+                      ? "Items Ordered"
+                      : widget.categories[index].name,
                   style: TextStyle(color: Colors.black),
                 ),
                 Container(child: Expanded(child: Text(" "))),
                 Text(
-                  widget.categories[index].products.length.toString(),
+                  widget.isManageOrder
+                      ? widget.currentOrder.orderedProduct.length.toString()
+                      : widget.categories[index].products.length.toString(),
                   style: TextStyle(
                     color: Colors.grey,
                   ),
                 ),
               ],
             ),
-            children: _getChildren(widget.categories[index].products.length,
-                widget.categories[index].name, index),
+            children: widget.isManageOrder
+                ? _getOrderedChildren(widget.currentOrder.orderedProduct.length)
+                : _getChildren(widget.categories[index].products.length,
+                    widget.categories[index].name, index),
           );
         });
   }
